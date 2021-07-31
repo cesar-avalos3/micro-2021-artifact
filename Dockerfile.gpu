@@ -1,0 +1,138 @@
+FROM nvidia/cuda:11.2.0-cudnn8-devel-ubuntu20.04
+
+ENV PYTHON_VERSION=3.7
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV PATH /opt/anaconda3/bin:$PATH
+
+ENV PYTHON_VERSION 2.7.15
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
+
+WORKDIR /root
+ENV HOME /root
+
+RUN apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+      git \
+      build-essential \
+      software-properties-common \
+      ca-certificates \
+      wget \
+      curl \
+      htop \
+      zip \
+      unzip
+
+RUN apt-get install  -y wget build-essential xutils-dev bison zlib1g-dev flex \
+      libglu1-mesa-dev git g++ libssl-dev libxml2-dev libboost-all-dev git g++ \
+      libxml2-dev vim python-setuptools python-dev build-essential
+
+RUN apt-get install -y gcc-7 g++-7 gcc-8 g++-8 gcc-9 g++-9
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+
+RUN apt-get install -y --no-install-recommends \
+      python2.7 \
+      python3.7 
+
+CMD nvidia-smi
+
+CMD nvcc --version
+
+RUN rm -f /usr/bin/python
+RUN ln -s /usr/bin/python2.7 /usr/bin/python
+
+ENV CUDA_INSTALL_PATH=/usr/local/cuda
+
+SHELL ["/bin/bash", "-c"]
+
+
+# COPY Makefile accel-sim-framework/gpu-simulator/
+# RUN mkdir accel-sim-framework/gpu-simulator/build
+# RUN mkdir accel-sim-framework/gpu-simulator/build/release
+# COPY main.makedepend accel-sim-framework/gpu-simulator/build/release
+# COPY trace-driven.Makefile.makedepend accel-sim-framework/gpu-simulator/build/release
+# COPY trace-parser.Makefile.makedepend accel-sim-framework/gpu-simulator/build/release
+
+RUN pwd
+
+RUN git clone https://github.com/accel-sim/accel-sim-framework.git && \
+    cd accel-sim-framework/gpu-simulator && \
+    source ./setup_environment.sh && \
+    make && \
+    cd ../..
+
+RUN apt-get install -y aria2
+
+RUN git clone https://github.com/accel-sim/gpu-app-collection.git
+
+COPY get_data.sh /root/gpu-app-collection/
+
+RUN cd gpu-app-collection/src && \
+    source setup_environment && \
+    make rodinia_2.0-ft rodinia-3.1 polybench parboil -j && \
+    cd ../..
+
+#COPY Build_Accelsim.sh .
+#CMD source ./Build_Accelsim.sh
+
+RUN apt-get install -y python3-pip && \
+    pip3 install psutil && \
+    pip3 install plotly && \
+    pip3 install pyyaml==5.1 # buildkit
+
+
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py && \ 
+    python get-pip.py && \
+    pip install pyyaml
+
+
+RUN apt-get install -y nsight-compute-2021.2.0
+
+ENV PATH="/opt/nvidia/nsight-compute/2021.2.0/:$PATH"
+
+RUN pip install psutil
+
+RUN cd accel-sim-framework && \ 
+    python get-accel-sim-traces.py -a tesla-v100/rodinia_2.0-ft && \
+    cd hw_run && \
+    tar -xzvf rodinia_2.0-ft.tgz
+
+# Uncomment any of these to obtain more traces
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/rodinia-3.1 && \
+#    cd hw_run && \
+#    tar -xzvf rodinia-3.1.tgz
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/cutlass && \
+#    cd hw_run && \
+#    tar -xzvf cutlass
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/parboil && \
+#    cd hw_run && \
+#    tar -xzvf parboil
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/deepbench && \
+#    cd hw_run && \
+#    tar -xzvf deepbench
+
+# Coming soon
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/mplerf_inference && \
+#    cd hw_run && \
+#    tar -xzvf mplerf_inference
+
+#RUN cd accel-sim-framework && \ 
+#    python get-accel-sim-traces.py -a tesla-v100/mplerf_training && \
+#    cd hw_run && \
+#    tar -xzvf mplerf_training
+
+CMD run.sh
