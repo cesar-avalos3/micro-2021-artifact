@@ -2030,8 +2030,8 @@ def pka_ipc_calculate_hw_info(sim_table, hw_profile):
 errors_ = []
 speedups_ = []
 
-base_hw_run_directory = '/accel-sim-framework/hw_run/11.2/release/'
-base_sim_run_directory = '/accel-sim-framework/sim_run/11.2/release/'
+base_hw_run_directory = '/accel-sim-framework/hw_run/device-0/11.2/'
+base_sim_run_directory = '/accel-sim-framework/sim_run_11.2/'
 
 benchmarks = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass']
 benchmarks_volta = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass', 'mlperf']
@@ -2050,7 +2050,7 @@ PKS_list, list_of_errors, list_of_speedups, PKS_dict, extra_results  = process_a
 
 paths_turing_simulations = paths.paths(base_sim_run_directory, "/RTX2060-SASS-VISUAL/", benchmarks)
 paths_turing_simulations_1B = paths.paths(base_sim_run_directory, "/RTX2060-SASS-VISUAL-1B_INSN/", benchmarks)
-paths_volta_simulations = paths.paths(base_sim_run_directory, "/QV100-SASS/", benchmarks)
+paths_volta_simulations = paths.paths(base_sim_run_directory, "/QV100-SASS-VISUAL/", benchmarks)
 paths_volta_simulations_1B = paths.paths(base_sim_run_directory, "/QV100-SASS-1B_INSN/", benchmarks)
 
 turing_simulations_full_dict = {}
@@ -2114,7 +2114,7 @@ for app in benchmarks_volta_paths:
 
 sim_data = {}
 benchmarks = ['rodinia-3.1', 'deepbench', 'polybench', 'parboil', 'cutlass']
-paths_benchmark = paths.paths(base_sim_run_directory, "/QV100-SASS/", benchmarks)
+paths_benchmark = paths.paths(base_sim_run_directory, "/QV100-SASS-VISUAL/", benchmarks)
 for app in paths_benchmark:
     sim_data[app] = main(paths_benchmark[app])
 
