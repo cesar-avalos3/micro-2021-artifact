@@ -65,11 +65,13 @@ RUN git clone https://github.com/accel-sim/accel-sim-framework.git && \
     make && \
     cd ../..
 
-RUN apt-get install -y aria2
-
 RUN git clone https://github.com/accel-sim/gpu-app-collection.git
 
-COPY get_data.sh /root/gpu-app-collection/
+# If download speeds are slow, uncomment the following two lines
+# to get a download speedup
+
+RUN apt-get install -y aria2
+COPY scripts/optional/get_data.sh /root/gpu-app-collection/
 
 RUN cd gpu-app-collection/src && \
     source setup_environment && \
@@ -135,4 +137,8 @@ RUN cd accel-sim-framework && \
 #    cd hw_run && \
 #    tar -xzvf mplerf_training
 
-CMD run.sh
+RUN pip3 install numpy matplotlib pandas plotly scipy scikit-learn statsmodels
+
+RUN git clone https://github.com/cesar-avalos3/micro-2021-artifact.git
+
+CMD . micro-2021-artifact/scripts/Run_Inside_Docker.sh
