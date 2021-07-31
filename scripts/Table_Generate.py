@@ -102,7 +102,7 @@ for app in PKS_Simulation_Cycles:
         print(e)
         pass
         #PKS_to_PKA_speedup[app] = 1
-rodinia_apps = paths.paths('', '', 'rodinia_2.1-ft')
+rodinia_apps = paths.paths('', '', 'rodinia-3.1')
 polybench_apps = paths.paths('', '', 'polybench')
 parboil_apps = paths.paths('', '', 'parboil')
 deepbench_apps = paths.paths('', '', 'deepbench')
