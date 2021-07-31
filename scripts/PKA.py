@@ -2030,11 +2030,13 @@ def pka_ipc_calculate_hw_info(sim_table, hw_profile):
 errors_ = []
 speedups_ = []
 
-base_hw_run_directory = '/accel-sim-framework/hw_run/device-0/11.2/'
-base_sim_run_directory = '/accel-sim-framework/sim_run_11.2/'
+base_hw_run_directory = '/root/accel-sim-framework/hw_run/device-0/11.2/'
+base_sim_run_directory = '/root/accel-sim-framework/sim_run_11.2/'
 
-benchmarks = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass']
-benchmarks_volta = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass', 'mlperf']
+#benchmarks = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass']
+benchmarks = ['rodinia-3.1']
+#benchmarks_volta = ['rodinia-3.1', 'deepbench', 'polybench', 'rodinia_2.0-ft', 'parboil', 'cutlass', 'mlperf']
+benchmarks_volta = ['rodinia-3.1']
 benchmarks_volta_paths = paths.paths(base_hw_run_directory, 'out.csv', benchmarks_volta)
 benchmarks_turing_paths = paths.paths(base_hw_run_directory, 'out.csv', benchmarks)
 benchmarks_ampere_paths = paths.paths(base_hw_run_directory, 'out.csv', benchmarks)

@@ -105,10 +105,10 @@ RUN cd accel-sim-framework && \
 
 # Uncomment any of these to obtain more traces
 
-#RUN cd accel-sim-framework && \ 
-#    python get-accel-sim-traces.py -a tesla-v100/rodinia-3.1 && \
-#    cd hw_run && \
-#    tar -xzvf rodinia-3.1.tgz
+RUN cd accel-sim-framework && \ 
+    python get-accel-sim-traces.py -a tesla-v100/rodinia-3.1 && \
+    cd hw_run && \
+    tar -xzvf rodinia-3.1.tgz
 
 #RUN cd accel-sim-framework && \ 
 #    python get-accel-sim-traces.py -a tesla-v100/cutlass && \
@@ -141,4 +141,11 @@ RUN pip3 install numpy matplotlib pandas plotly scipy scikit-learn statsmodels
 
 RUN git clone https://github.com/cesar-avalos3/micro-2021-artifact.git
 
-CMD . micro-2021-artifact/scripts/Run_Inside_Docker.sh
+COPY scripts/Run_Inside_Docker.sh .
+COPY scripts/Check_Job_Status.sh .
+COPY scripts/Run_PKA.sh .
+
+COPY scripts/run_hw.py accel-sim-framework/util/hw_stats/
+
+#COPY scripts/run_hw.py .
+CMD . Run_Inside_Docker.sh

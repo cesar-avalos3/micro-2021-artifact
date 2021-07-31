@@ -20,7 +20,7 @@ def open_variables(filename):
 
 PKA_Intra_Kernel = open_variables('pka_intrakernel')
 PKA_Inter_Kernel = open_variables('pka_interkernel')
-Turing_Simulations_Full = open_variables('Turing-Simulations-Full')
+#Turing_Simulations_Full = open_variables('Turing-Simulations-Full')
 PKS_Turing = open_variables('PKS_Turing')
 PKS_Ampere = open_variables('PKS_Ampere')
 PKS_Volta = open_variables('PKS_Volta')
@@ -51,38 +51,87 @@ strings.append(r'\textbf{Rodinia Suite} & \multicolumn{1}{l|}{} & \multicolumn{1
 strings.append('\n')
 
 min(len(PKS_Turing),len(PKS_Ampere), len(PKS_Volta))
-PKA_Complete = open_variables("PKA_Complete")
+#PKA_Complete = open_variables("PKA_Complete")
 PKA_IntraKernel = open_variables('pka_intrakernel')
 PKS_InterKernel = open_variables('pka_interkernel')
+simulator_data = open_variables('simulator_data_10_samples')
+
+Simulation_Cycles = {}
+
+for app in simulator_data:
+    total_cycles = np.sum([simulator_data[app][0][k]['cycles'][-1] * 1.0 for k in simulator_data[app][0]])
+    Simulation_Cycles[app] = total_cycles
+
 
 PKS_Simulation_Cycles = {}
 PKS_Simulation_Projected_Cycles = {}
 PKA_Simulation_Projected_Cycles = {}
 PKA_Simulation_Cycles = {}
 for app in PKA_IntraKernel:
-    PKS_Simulation_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_original'] for k in PKA_IntraKernel[app]])
-    PKS_Simulation_Projected_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_original'] * PKS_InterKernel[app]['group_counts'][i] for i,k in enumerate(PKS_InterKernel[app]['kernel_ids'])])
-    PKA_Simulation_Projected_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_projection'] * PKS_InterKernel[app]['group_counts'][i] for i,k in enumerate(PKS_InterKernel[app]['kernel_ids'])])
-    PKA_Simulation_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_reduced'] for k in PKA_IntraKernel[app]])
-
+    try:
+        #print(app)
+        #print(PKA_IntraKernel[app])
+        PKS_Simulation_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_original'] for k in PKA_IntraKernel[app]])
+        PKS_Simulation_Projected_Cycles[app] = np.sum([PKA_IntraKernel[app][str(int(k+1))]['cycles_original'] * PKS_InterKernel[app]['group_counts'][i] for i,k in enumerate(PKS_InterKernel[app]['kernel_ids'])])
+        PKA_Simulation_Projected_Cycles[app] = np.sum([PKA_IntraKernel[app][str(int(k+1))]['cycles_projection'] * PKS_InterKernel[app]['group_counts'][i] for i,k in enumerate(PKS_InterKernel[app]['kernel_ids'])])
+        PKA_Simulation_Cycles[app] = np.sum([PKA_IntraKernel[app][k]['cycles_reduced'] for k in PKA_IntraKernel[app]])
+    except Exception as e:
+        print(e)
+        pass
+Simulator_Error = {}
 PKS_Simulation_Error = {}
 PKA_Simulation_Error = {}
-for app in PKS_Simulation_Cycles:
-    cycles_hw_app = pd.to_numeric(HW_Profile_Tables[app]['gpc__cycles_elapsed.avg']).sum()
-    PKS_Simulation_Error[app] = round((100 * np.abs(cycles_hw_app - PKS_Simulation_Projected_Cycles[app])/cycles_hw_app),2)
-    PKA_Simulation_Error[app] = round((100 * np.abs(cycles_hw_app - PKA_Simulation_Projected_Cycles[app])/cycles_hw_app),2)
 
-PKS_to_PKA_speedup = {}
 for app in PKS_Simulation_Cycles:
-    PKS_to_PKA_speedup[app] = PKS_Simulation_Cycles / PKA_Simulation_Cycles
+    try:
+        cycles_hw_app = pd.to_numeric(HW_Profile_Tables[app]['gpc__cycles_elapsed.avg']).sum()
+        PKS_Simulation_Error[app] = round((100 * np.abs(cycles_hw_app - PKS_Simulation_Projected_Cycles[app])/cycles_hw_app),2)
+        PKA_Simulation_Error[app] = round((100 * np.abs(cycles_hw_app - PKA_Simulation_Projected_Cycles[app])/cycles_hw_app),2)
+        Simulator_Error[app]      = round((100 * np.abs(cycles_hw_app - Simulation_Cycles[app]) / cycles_hw_app),2)
+    except Excetion as e:
+        print(e)
+        pass
 
-rodinia_apps = paths.paths('', '', 'rodinia-3.1')
+PKS_to_Sim_speedup = {}
+PKA_to_Sim_speedup = {}
+for app in PKS_Simulation_Cycles:
+    try:
+        PKS_to_Sim_speedup[app] = Simulation_Cycles[app] / PKS_Simulation_Cycles[app]
+        PKA_to_Sim_speedup[app] = Simulation_Cycles[app] / PKA_Simulation_Cycles[app]
+    except Exception as e:
+        print(e)
+        pass
+        #PKS_to_PKA_speedup[app] = 1
+rodinia_apps = paths.paths('', '', 'rodinia_2.1-ft')
 polybench_apps = paths.paths('', '', 'polybench')
 parboil_apps = paths.paths('', '', 'parboil')
 deepbench_apps = paths.paths('', '', 'deepbench')
 cutlass_apps = paths.paths('', '', 'cutlass')
 
+all_benchmarks = {'Rodinia': rodinia_apps, 'Polybench': polybench_apps, 'Parboil': parboil_apps, 'Deepbench':deepbench_apps, 'Cutlass':cutlass_apps}
+
 # Generate rodinia applications
+
+for b_ in all_benchmarks:
+    bench = all_benchmarks[b_]
+    strings.append(r'\textbf{'+b_+r' Suite} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline')
+    strings.append('\n')
+
+    for app in all_benchmarks[bench]:
+        try:
+            app_ = app.replace('_',' ')
+            row_string = app_ + ' & '
+            row_string += str(round(100 * PKS_Volta[app]['error'],2)) + ' & ' + str(round(PKS_Volta[app]['speedup'],2)) + ' & '
+            row_string += str(round(100 * PKS_Turing[app]['error'],2)) + ' & ' + str(round(PKS_Turing[app]['speedup'],2)) + ' & '
+            row_string += str(round(100 * PKS_Ampere[app]['error'],2)) + ' & ' + str(round(PKS_Ampere[app]['speedup'],2)) + ' & '
+            row_string += str(Simulator_Error[app]) + ' & ' + str(PKS_Simulation_Error[app]) + ' & '
+            row_string += str(round(PKS_to_Sim_speedup[app],2)) + ' & ' + str(PKA_Simulation_Error[app]) + ' & '
+            row_string += str(round(PKA_to_Sim_speedup[app],2)) + r" \\ \hline"
+            row_string += '\n'
+            strings.append(row_string)
+        except:
+            pass
+
 
 for app in rodinia_apps:
     try:
