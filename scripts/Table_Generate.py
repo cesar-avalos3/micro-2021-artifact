@@ -59,9 +59,11 @@ simulator_data = open_variables('simulator_data_10_samples')
 Simulation_Cycles = {}
 
 for app in simulator_data:
-    total_cycles = np.sum([simulator_data[app][0][k]['cycles'][-1] * 1.0 for k in simulator_data[app][0]])
-    Simulation_Cycles[app] = total_cycles
-
+    try:
+        total_cycles = np.sum([simulator_data[app][0][k]['cycles'][-1] * 1.0 for k in simulator_data[app][0]])
+        Simulation_Cycles[app] = total_cycles
+    except:
+        pass
 
 PKS_Simulation_Cycles = {}
 PKS_Simulation_Projected_Cycles = {}
@@ -117,7 +119,7 @@ for b_ in all_benchmarks:
     strings.append(r'\textbf{'+b_+r' Suite} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \hline')
     strings.append('\n')
 
-    for app in all_benchmarks[bench]:
+    for app in all_benchmarks[b_]:
         try:
             app_ = app.replace('_',' ')
             row_string = app_ + ' & '
@@ -132,7 +134,7 @@ for b_ in all_benchmarks:
         except:
             pass
 
-
+'''
 for app in rodinia_apps:
     try:
         app_ = app.replace('_',' ')
@@ -208,7 +210,7 @@ for app in cutlass_apps:
     except:
         pass
 
-
+'''
 strings.append('\n')
 
 strings.append(r'\end{tabular}')

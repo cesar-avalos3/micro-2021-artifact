@@ -444,10 +444,10 @@ def process_all(Beeg_Table, list_of_apps, extra_archs=[''], min_error_arg = 0.05
         list_of_turing_names = []
         list_of_turing_total_runtimes = []
         for app in all_paths_turing:
-            table = open_file(all_paths_turing[app])
-            time = pd.to_numeric(table['gpc__cycles_elapsed.avg']).sum()
             #print(table)
             try:
+                table = open_file(all_paths_turing[app])
+                time = pd.to_numeric(table['gpc__cycles_elapsed.avg']).sum()
                 DF_Large = generate_DF(table)
                 list_of_turing_apps.append(app)
                 temp_results = check_results(DF_Large,best_choices=best_choices_dict[app][0], group_counts=best_choices_dict[app][1])
@@ -469,8 +469,8 @@ def process_all(Beeg_Table, list_of_apps, extra_archs=[''], min_error_arg = 0.05
         list_of_ampere_speedups = []
         list_of_ampere_names = []
         for app in all_paths_ampere:
-            table = open_file(all_paths_ampere[app])
             try:
+                table = open_file(all_paths_ampere[app])
                 DF_Large = generate_DF(table)
                 list_of_ampere_apps.append(app)
                 temp_results = check_results(DF_Large,best_choices=best_choices_dict[app][0], group_counts=best_choices_dict[app][1])
@@ -1134,13 +1134,14 @@ def ignore_lines(file):
     # is found, else return -99
     # This phrase is always printed by nsight-compute.
     i = 0
-    with open(file) as in_file:
-        for line in in_file:
-            if ("device__attribute_async_engine_count" in line):
-                return i
-            elif(i > 1000):
-                return -99
-            i += 1
+    try:
+        with open(file) as in_file:
+            for line in in_file:
+                if ("device__attribute_async_engine_count" in line):
+                    return i
+                elif(i > 1000):
+                    return -99
+                i += 1
             
 # General open file function, takes in a nsight-compute csv filename, 
 # returns a pandas table.
@@ -1532,10 +1533,10 @@ def process_all(Beeg_Table, list_of_apps, extra_archs=[''], min_error_arg = 0.05
         list_of_turing_names = []
         list_of_turing_total_runtimes = []
         for app in all_paths_turing:
-            table = open_file(all_paths_turing[app])
-            time = pd.to_numeric(table['gpc__cycles_elapsed.avg']).sum()
             #print(table)
             try:
+                table = open_file(all_paths_turing[app])
+                time = pd.to_numeric(table['gpc__cycles_elapsed.avg']).sum()
                 DF_Large = generate_DF(table)
                 list_of_turing_apps.append(app)
                 temp_results = check_results(DF_Large,best_choices=best_choices_dict[app][0], group_counts=best_choices_dict[app][1])
@@ -1557,8 +1558,8 @@ def process_all(Beeg_Table, list_of_apps, extra_archs=[''], min_error_arg = 0.05
         list_of_ampere_speedups = []
         list_of_ampere_names = []
         for app in all_paths_ampere:
-            table = open_file(all_paths_ampere[app])
             try:
+                table = open_file(all_paths_ampere[app])
                 DF_Large = generate_DF(table)
                 list_of_ampere_apps.append(app)
                 temp_results = check_results(DF_Large,best_choices=best_choices_dict[app][0], group_counts=best_choices_dict[app][1])
@@ -1859,21 +1860,15 @@ def process_all_files_discrete_opened_tables(RKS_Best_Choices_Dict, tables, sing
         output_2 = {}
         cycles_simulator = 0.0
         cycles_simulator_array = []
-        best_kernels = RKS_Best_Choices_Dict[app]['kernel_ids']
-        group_counts = RKS_Best_Choices_Dict[app]['group_counts']
-        print(best_kernels)
-        list_of_kernel_cycles = []
-        #print(paths[app])
-#            log_path, out_path = RGS.get_paths(file)
-#            print(out_path)
-#            result = parse_cycles_per_kernel(out_path)
         try:
+            best_kernels = RKS_Best_Choices_Dict[app]['kernel_ids']
+            group_counts = RKS_Best_Choices_Dict[app]['group_counts']
+            print(best_kernels)
+            list_of_kernel_cycles = []
             kl = tables[app][0]
             ki = tables[app][1]
         except:
             continue
-            #kl, ki = parse_lines(log_path, out_path)
-            #print(ki)
         result_2 = projection_cycles(kl, ki)
             #print(ki['kernel_ids'])
         #output.update(result)
