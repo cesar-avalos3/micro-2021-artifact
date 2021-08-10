@@ -137,7 +137,7 @@ RUN cd accel-sim-framework && \
 #    cd hw_run && \
 #    tar -xzvf mplerf_training
 
-RUN pip3 install numpy matplotlib pandas plotly scipy scikit-learn statsmodels
+RUN pip3 install numpy matplotlib pandas plotly scipy scikit-learn statsmodels ipywidgets
 
 RUN git clone https://github.com/cesar-avalos3/micro-2021-artifact.git
 
