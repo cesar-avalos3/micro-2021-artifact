@@ -1,1 +1,1 @@
-python accel-sim-framework/gpu-simulator/util/job_launching/job_status.py
+python accel-sim-framework/util/job_launching/job_status.py
