@@ -2119,7 +2119,7 @@ PKA_dict = {}
 for app in sim_data:
     try:
         print(app)
-        PKA_dict[app] = projection_cycles_only_selected(sim_data[app][0], sim_data[app][1], PKS_dict, window=300, threshold=0.25)
+        PKA_dict[app] = projection_cycles_only_selected(sim_data[app][0], sim_data[app][1], PKS_dict, window=6, threshold=0.25)
     except Exception as e:
         print(e)
         pass
