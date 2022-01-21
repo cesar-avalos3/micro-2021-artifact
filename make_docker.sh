@@ -1,1 +1,0 @@
-sudo nvidia-docker build -t micro-2021-pka -f Dockerfile.gpu .
